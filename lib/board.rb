@@ -60,7 +60,7 @@ class Board < Gosu::Image
   protected
 
   def set_status
-    @window.status.set("#{current_player.name} move (#{current_player.cell})")
+    @window.status.set("#{current_player.name} move (#{current_player.cell})\n" + @routes.all_from(current_player.cell))
   end
 
   def cell_from_xy(x, y)

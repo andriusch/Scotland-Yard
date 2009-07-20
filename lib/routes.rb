@@ -14,6 +14,14 @@ class Routes
     to ? @routes[from][to] : @routes[from]
   end
 
+  def all_from(from)
+    all = []
+    @routes[from].each do |to, trans|
+      trans.each {|t| all << "#{Routes.name(t)} to #{to}"}
+    end
+    all.join("\n")
+  end
+
   def self.name(transport)
     NAMES[transport]
   end
