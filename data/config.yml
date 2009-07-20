@@ -1,0 +1,31 @@
+detectives:
+    'Detective 1':
+        color: 0xaa00ff
+    'Detective 2': 
+        color: 0xff0000
+    'Detective 3':
+        color: 0x00ff00
+    'Detective 4':
+        color: 0xffff00
+    'Detective 5':
+        color: 0x0000ff
+
+starting:
+    - 197
+    - 132
+    - 94
+    - 103
+    - 26
+    - 141
+    - 112
+    - 91
+    - 155
+    - 34
+    - 29
+    - 50
+    - 53
+    - 198
+    - 174
+    - 13
+    - 138
+    - 117

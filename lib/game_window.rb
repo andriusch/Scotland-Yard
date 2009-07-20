@@ -7,6 +7,10 @@ class GameWindow < Gosu::Window
     @cursor = Cursor.new(self)
   end
 
+  def logger
+    @log
+  end
+
   def button_up(button)
     case button
       when Gosu::MsLeft:

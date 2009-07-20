@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'gosu'
+require 'set'
 
 Dir.chdir(File.join(File.dirname(__FILE__), '..'))
 Dir.glob('lib/*.rb').each {|f| require f unless f == "lib/main.rb"}

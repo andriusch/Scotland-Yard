@@ -3,12 +3,17 @@ class Board < Gosu::Image
     super(window, "data/map.png", true)
     @scalex = LEFT_PANEL_X.to_f / self.width
     @scaley = window.height.to_f / self.height
-    @detectives = [[0xaa00ff, 10], [0xff0000, 111], [0x00ff00, 73], [0xffff00, 17], [0x0000ff, 183]].collect {|c| Player.new(window, c[0], c[1]) }
-    @mr_x = Player.new(window, 0xdddddd, 45)
+    @window = window
 
-    @current_player_id = 1
+    @config = YAML.load(IO.read("data/config.yml"))
+    puts @config.inspect
+    @config['starting'].shuffle!
+    @mr_x = Player.new(window, 'Mr. X', 0x22aaaaaa, @config['starting'].shift)
+    @detectives = @config['detectives'].keys.collect {|k| Player.new(window, k, @config['detectives'][k]['color'], @config['starting'].shift) }
+    @current_player_id = 0
 
     load_coords
+    @routes = Routes.new('data/SCOTMAP.TXT')
   end
 
   def draw
@@ -18,19 +23,33 @@ class Board < Gosu::Image
   end
 
   def current_player
-    @current_player_id == 0 ? @mr_x : @detectives[@current_player_id]
+    @current_player_id == 0 ? @mr_x : @detectives[@current_player_id - 1]
+  end
+
+  def current_player_name
+    @current_player_id == 0 ? 'Mr. X' : "Detective #{@current_player_id}"
   end
 
   def current_player_goto(x, y)
     cell = cell_from_xy(x, y)
-    puts "Go to #{cell.inspect}"
-    current_player.cell = cell + 1 if cell
+    cur_player = current_player
+    if cell and @routes[cur_player.cell, cell]
+      @window.logger.log("#{current_player_name} - #{@routes.to_s(cur_player.cell, cell)}")
+      cur_player.cell = cell
+      next_player
+    end
+  end
+
+  def next_player
+    @current_player_id = (@current_player_id + 1) % (@detectives.size + 1)
+    puts @current_player_id
   end
 
   protected
 
   def cell_from_xy(x, y)
-    @coords.index {|c| ((x - 8)..(x + 8)).include?(c[:x] * @scalex) and ((y - 8)..(y + 8)).include?(c[:y] * @scaley)}
+    cell = @coords.index {|c| ((x - 8)..(x + 8)).include?(c[:x] * @scalex) and ((y - 8)..(y + 8)).include?(c[:y] * @scaley)}
+    cell + 1 if cell
   end
 
   def draw_player(p)
@@ -43,9 +62,5 @@ class Board < Gosu::Image
       line =~ /(\d+)\s*,\s*(\d+)/
       {:x => $1.to_i, :y => $2.to_i}
     end
-  end
-
-  def load_routes
-    
   end
 end

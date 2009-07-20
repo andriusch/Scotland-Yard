@@ -11,7 +11,6 @@ class Log
   end
 
   def draw
-    log('Detective 1 - taxi 999')
     @lines.reverse.take(10).each_with_index do |line, i|
       @font.draw(line, @x + 2, @y + i * 16 + 2, 0)
     end
