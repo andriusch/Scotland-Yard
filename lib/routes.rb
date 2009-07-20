@@ -14,8 +14,8 @@ class Routes
     to ? @routes[from][to] : @routes[from]
   end
 
-  def to_s(from, to)
-    "#{NAMES[@routes[from][to].first]} #{to}"
+  def self.name(transport)
+    NAMES[transport]
   end
 
   protected

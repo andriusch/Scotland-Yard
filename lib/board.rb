@@ -6,14 +6,15 @@ class Board < Gosu::Image
     @window = window
 
     @config = YAML.load(IO.read("data/config.yml"))
-    puts @config.inspect
-    @config['starting'].shuffle!
-    @mr_x = Player.new(window, 'Mr. X', 0x22aaaaaa, @config['starting'].shift)
-    @detectives = @config['detectives'].keys.collect {|k| Player.new(window, k, @config['detectives'][k]['color'], @config['starting'].shift) }
+    starting = @config['starting'].shuffle
+    @mr_x = Criminal.new(window, 'Mr. X', 0x22aaaaaa, starting.shift)
+    @detectives = @config['detectives'].collect {|d| Player.new(window, d['name'], d['color'], starting.shift) }
     @current_player_id = 0
 
     load_coords
     @routes = Routes.new('data/SCOTMAP.TXT')
+
+    set_status
   end
 
   def draw
@@ -33,19 +34,34 @@ class Board < Gosu::Image
   def current_player_goto(x, y)
     cell = cell_from_xy(x, y)
     cur_player = current_player
-    if cell and @routes[cur_player.cell, cell]
-      @window.logger.log("#{current_player_name} - #{@routes.to_s(cur_player.cell, cell)}")
-      cur_player.cell = cell
-      next_player
+    route = @routes[cur_player.cell, cell]
+    if cell and route
+      if route.size == 1
+        cur_player.move(cell, route.first)
+        next_player
+        return nil
+      else
+        @last_move = cell
+        return route.to_a.join('')
+      end
     end
+  end
+
+  def make_last_move(trans)
+    current_player.move(@last_move, trans)
+    next_player
   end
 
   def next_player
     @current_player_id = (@current_player_id + 1) % (@detectives.size + 1)
-    puts @current_player_id
+    set_status
   end
 
   protected
+
+  def set_status
+    @window.status.set("#{current_player.name} move (#{current_player.cell})")
+  end
 
   def cell_from_xy(x, y)
     cell = @coords.index {|c| ((x - 8)..(x + 8)).include?(c[:x] * @scalex) and ((y - 8)..(y + 8)).include?(c[:y] * @scaley)}

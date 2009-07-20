@@ -1,14 +1,14 @@
 detectives:
-    'Detective 1':
-        color: 0xaa00ff
-    'Detective 2': 
-        color: 0xff0000
-    'Detective 3':
-        color: 0x00ff00
-    'Detective 4':
-        color: 0xffff00
-    'Detective 5':
-        color: 0x0000ff
+    - name: 'Detective purple'
+      color: 0xaa00ff
+    - name: 'Detective red'
+      color: 0xff0000
+    - name: 'Detective green'
+      color: 0x00ff00
+    - name: 'Detective yellow'
+      color: 0xffff00
+    - name: 'Detective blue'
+      color: 0x0000ff
 
 starting:
     - 197
