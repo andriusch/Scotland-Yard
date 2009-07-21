@@ -1,9 +1,11 @@
 class TransportForm < Form
+  attr_accessor :taxi, :bus, :ug
+
   def initialize(window, x, y, z, width, height)
     super
-    @taxi = TransportButton.new(window, 0, 0, 'taxi', 'T')
-    @bus = TransportButton.new(window, 0, 20, 'bus', 'B')
-    @ug = TransportButton.new(window, 0, 40, 'ug', 'U')
+    @taxi = Clickable.new(window, 0, 0, 'taxi')
+    @bus = Clickable.new(window, 0, 20, 'bus')
+    @ug = Clickable.new(window, 0, 40, 'ug')
     add_component(@taxi)
     add_component(@bus)
     add_component(@ug)
@@ -19,7 +21,6 @@ class TransportForm < Form
   end
 
   def click(x, y)
-    hide
     super
   end
 

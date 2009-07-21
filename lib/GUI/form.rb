@@ -17,7 +17,9 @@ class Form
   end
 
   def click(x, y)
-    @components.select {|c| c.clicked?(x - self.left, y - self.top) }.each {|c| c.click }
+    clicked = @components.select {|c| c.clicked?(x - self.left, y - self.top) }
+    clicked.each {|c| c.click }
+    hide unless clicked.empty?
   end
 
   def draw

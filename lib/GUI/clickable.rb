@@ -9,4 +9,12 @@ class Clickable < Gosu::Image
     @left = x
     @top = y
   end
+
+  def on_click(&block)
+    @on_click = block 
+  end
+
+  def click
+    @on_click.call if @on_click
+  end
 end

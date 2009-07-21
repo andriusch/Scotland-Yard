@@ -9,18 +9,18 @@ class Board < Gosu::Image
     starting = @config['starting'].shuffle
     @mr_x = Criminal.new(window, 'Mr. X', 0x22aaaaaa, starting.shift)
     @detectives = @config['detectives'].collect {|d| Player.new(window, d['name'], d['color'], starting.shift) }
-    @current_player_id = 0
 
     load_coords
     @routes = Routes.new('data/SCOTMAP.TXT')
 
-    set_status
+    @current_player_id = @detectives.size
+    next_player
   end
 
   def draw
     super(0, 0, 0, @scalex, @scaley)
     @detectives.each {|d| draw_player(d)}
-    draw_player(@mr_x)
+    draw_player(@mr_x) if @mr_x.visible
   end
 
   def current_player
@@ -42,7 +42,7 @@ class Board < Gosu::Image
         return nil
       else
         @last_move = cell
-        return route.to_a.join('')
+        return route
       end
     end
   end
@@ -53,7 +53,16 @@ class Board < Gosu::Image
   end
 
   def next_player
-    @current_player_id = (@current_player_id + 1) % (@detectives.size + 1)
+    @current_player_id = @current_player_id + 1
+    if @current_player_id > @detectives.size
+      @window.start_mrx_move
+    else
+      set_status
+    end
+  end
+
+  def mrx_move
+    @current_player_id = 0
     set_status
   end
 
