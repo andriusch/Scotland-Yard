@@ -47,6 +47,11 @@ class GameWindow < Gosu::Window
     @clickables.sort {|a, b| a.z <=> b.z}
   end
 
+  def reset
+    @board.reset
+    @logger.reset
+  end
+
   def update
 
   end
