@@ -10,7 +10,7 @@ class Board < Gosu::Image
     @mr_x = Criminal.new(window, 'Mr. X', 0x22aaaaaa, starting.shift)
     @detectives = @config['detectives'].collect {|d| Player.new(window, d['name'], d['color'], starting.shift) }
 
-    load_coords
+    @coords = Coords.new(@scalex, @scaley)
     @routes = Routes.new('data/SCOTMAP.TXT')
 
     @current_player_id = @detectives.size
@@ -27,12 +27,8 @@ class Board < Gosu::Image
     @current_player_id == 0 ? @mr_x : @detectives[@current_player_id - 1]
   end
 
-  def current_player_name
-    @current_player_id == 0 ? 'Mr. X' : "Detective #{@current_player_id}"
-  end
-
   def current_player_goto(x, y)
-    cell = cell_from_xy(x, y)
+    cell = @coords.cell_from_xy(x, y)
     cur_player = current_player
     route = @routes[cur_player.cell, cell]
     if cell and route
@@ -72,20 +68,8 @@ class Board < Gosu::Image
     @window.status.set("#{current_player.name} move (#{current_player.cell})\n" + @routes.all_from(current_player.cell))
   end
 
-  def cell_from_xy(x, y)
-    cell = @coords.index {|c| ((x - 8)..(x + 8)).include?(c[:x] * @scalex) and ((y - 8)..(y + 8)).include?(c[:y] * @scaley)}
-    cell + 1 if cell
-  end
-
   def draw_player(p)
     c = @coords[p.cell - 1]
     p.draw(c[:x] * @scalex - 12, c[:y] * @scaley - 12)
-  end
-
-  def load_coords
-    @coords ||= IO.readlines('data/COORDS.TXT').collect do |line|
-      line =~ /(\d+)\s*,\s*(\d+)/
-      {:x => $1.to_i, :y => $2.to_i}
-    end
   end
 end
