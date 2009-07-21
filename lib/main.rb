@@ -14,13 +14,14 @@ require 'game_window'
 require 'log'
 require 'routes'
 require 'status'
+require 'coords'
 
 Dir.chdir(File.join(File.dirname(__FILE__), '..'))
 
 WIDTH = 1024
 HEIGHT = 768
 LEFT_PANEL_X = WIDTH - 200
-STATUS_Y = 165
+STATUS_Y = 200
 
 srand
 

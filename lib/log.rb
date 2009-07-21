@@ -1,8 +1,14 @@
 class Log
+  attr_accessor :lines
+  
   def initialize(window)
     @font = Gosu::Font.new(window, 'Sans', 16)
     @x = LEFT_PANEL_X
     @y = 0
+    reset
+  end
+
+  def reset
     @lines = []
   end
 

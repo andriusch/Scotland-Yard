@@ -1,6 +1,6 @@
 class Coords
-  def intialize(scalex, scaley)
-    @coords = IO.readlines('data/COORDS.TXT').collect do |line|
+  def initialize(scalex, scaley)
+    @coords = IO.readlines('data/coords.txt').collect do |line|
       line =~ /(\d+)\s*,\s*(\d+)/
       {:x => $1.to_i * scalex, :y => $2.to_i * scaley}
     end

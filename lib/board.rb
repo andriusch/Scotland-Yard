@@ -6,12 +6,15 @@ class Board < Gosu::Image
     @window = window
 
     @config = YAML.load(IO.read("data/config.yml"))
+    @coords = Coords.new(@scalex, @scaley)
+    @routes = Routes.new('data/routes.txt')
+    reset
+  end
+
+  def reset
     starting = @config['starting'].shuffle
     @mr_x = Criminal.new(window, 'Mr. X', 0x22aaaaaa, starting.shift)
     @detectives = @config['detectives'].collect {|d| Player.new(window, d['name'], d['color'], starting.shift) }
-
-    @coords = Coords.new(@scalex, @scaley)
-    @routes = Routes.new('data/SCOTMAP.TXT')
 
     @current_player_id = @detectives.size
     next_player
