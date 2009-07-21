@@ -13,8 +13,8 @@ class Board < Gosu::Image
 
   def reset
     starting = @config['starting'].shuffle
-    @mr_x = Criminal.new(window, 'Mr. X', 0x22aaaaaa, starting.shift)
-    @detectives = @config['detectives'].collect {|d| Player.new(window, d['name'], d['color'], starting.shift) }
+    @mr_x = Criminal.new(@window, 'Mr. X', 0x22aaaaaa, starting.shift)
+    @detectives = @config['detectives'].collect {|d| Player.new(@window, d['name'], d['color'], starting.shift) }
 
     @current_player_id = @detectives.size
     next_player
@@ -52,11 +52,13 @@ class Board < Gosu::Image
   end
 
   def next_player
-    @current_player_id = @current_player_id + 1
-    if @current_player_id > @detectives.size
-      @window.start_mrx_move
-    else
-      set_status
+    unless check_win
+      @current_player_id = @current_player_id + 1
+      if @current_player_id > @detectives.size
+        @window.start_mrx_move
+      else
+        set_status
+      end
     end
   end
 
@@ -67,12 +69,22 @@ class Board < Gosu::Image
 
   protected
 
+  def check_win
+    @detectives.each do |detective|
+      if detective.cell == @mr_x.cell
+        @window.gameover(true)
+        return true
+      end
+    end
+    return false
+  end
+
   def set_status
     @window.status.set("#{current_player.name} move (#{current_player.cell})\n" + @routes.all_from(current_player.cell))
   end
 
   def draw_player(p)
     c = @coords[p.cell - 1]
-    p.draw(c[:x] * @scalex - 12, c[:y] * @scaley - 12)
+    p.draw(c[:x] - 12, c[:y] - 12)
   end
 end

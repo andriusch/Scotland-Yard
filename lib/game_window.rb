@@ -5,7 +5,7 @@ class GameWindow < Gosu::Window
     super(1024, 768, false)
     self.caption = "Scotland Yard"
 
-    @clickables = []
+    @forms = []
     @f = TransportForm.new(self, 0, 0, 20, 80, 0)
     @f.taxi.on_click { @board.make_last_move('T') }
     @f.bus.on_click { @board.make_last_move('B') }
@@ -14,6 +14,9 @@ class GameWindow < Gosu::Window
     @mrx_form = Form.new(self, 0, 0, 90, self.width, self.height)
     @mrx_form.add_component(button = Clickable.new(self, 450, 350, 'mrxmove'))
     button.on_click { @board.mrx_move }
+
+    @win_form = WinForm.new(self, 0, 0, 99, self.width, self.height)
+    @win_form.on_click { self.reset }
     
     @logger = Log.new(self)
     @cursor = Cursor.new(self)
@@ -25,13 +28,17 @@ class GameWindow < Gosu::Window
     @mrx_form.show
   end
 
+  def gameover(detective_win)
+    @win_form.show(detective_win)
+  end
+
   def button_up(button)
     case button
       when Gosu::MsLeft:
         x, y = mouse_x, mouse_y
-        ind = @clickables.index{|c| puts c.clicked?(x, y); c.clicked?(x, y) }
+        ind = @forms.index{|c| c.clicked?(x, y) }
         if ind
-          @clickables[ind].click(x, y)
+          @forms[ind].click(x, y)
         elsif mouse_x < LEFT_PANEL_X
           if t = @board.current_player_goto(x, y)
             @f.top = y
@@ -43,8 +50,8 @@ class GameWindow < Gosu::Window
   end
 
   def register_clickable(clickable)
-    @clickables << clickable
-    @clickables.sort {|a, b| a.z <=> b.z}
+    @forms << clickable
+    @forms.sort {|a, b| a.z <=> b.z}
   end
 
   def reset
@@ -61,7 +68,6 @@ class GameWindow < Gosu::Window
     @logger.draw
     @status.draw
     @cursor.draw
-    @f.draw
-    @mrx_form.draw
+    @forms.each {|c| c.draw }
   end
 end
