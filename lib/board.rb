@@ -33,7 +33,10 @@ class Board < Gosu::Image
   def current_player_goto(x, y)
     cell = @coords.cell_from_xy(x, y)
     cur_player = current_player
+
     route = @routes[cur_player.cell, cell]
+    @detectives.each {|d| route = nil if d.cell == cell}
+
     if cell and route
       if route.size == 1
         cur_player.move(cell, route.first)
@@ -80,7 +83,8 @@ class Board < Gosu::Image
   end
 
   def set_status
-    @window.status.set("#{current_player.name} move (#{current_player.cell})\n" + @routes.all_from(current_player.cell))
+    @window.status.set("#{current_player.name} move (#{current_player.cell})\n" +
+            @routes.all_from(current_player.cell, @detectives.collect{|d| d.cell}))
   end
 
   def draw_player(p)

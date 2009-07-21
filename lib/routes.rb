@@ -14,10 +14,10 @@ class Routes
     to ? @routes[from][to] : @routes[from]
   end
 
-  def all_from(from)
+  def all_from(from, occupied)
     all = []
     @routes[from].each do |to, trans|
-      trans.each {|t| all << "#{Routes.name(t)} to #{to}"}
+      trans.each {|t| all << "#{Routes.name(t)} to #{to}"} unless occupied.include?(to)
     end
     all.join("\n")
   end
