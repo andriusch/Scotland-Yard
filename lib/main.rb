@@ -22,7 +22,8 @@ Dir.chdir(File.join(File.dirname(__FILE__), '..'))
 WIDTH = 1024
 HEIGHT = 768
 LEFT_PANEL_X = WIDTH - 200
-STATUS_Y = 200
+STATUS_Y = 175
+BUTTONS_Y = 430
 
 srand
 

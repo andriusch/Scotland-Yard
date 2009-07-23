@@ -11,7 +11,7 @@ class Status
   end
 
   def draw
-    @lines.take(10).each_with_index do |line, i|
+    @lines.take(15).each_with_index do |line, i|
       @font.draw(line, @x + 2, @y + i * 16 + 2, 0)
     end
   end
