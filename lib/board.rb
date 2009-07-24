@@ -1,4 +1,6 @@
 class Board < Gosu::Image
+  attr_reader :mr_x, :detectives
+
   def initialize(window)
     super(window, "data/map.png", true)
     @scalex = LEFT_PANEL_X.to_f / self.width
@@ -6,15 +8,14 @@ class Board < Gosu::Image
     @window = window
 
     @config = YAML.load(IO.read("data/config.yml"))
-    @coords = Coords.new(@scalex, @scaley)
-    @routes = Routes.new('data/routes.txt')
+    Coords.instance.scalex, Coords.instance.scaley = @scalex, @scaley
     reset
   end
 
   def reset
     starting = @config['starting'].shuffle
-    @mr_x = Criminal.new(@window, 'Mr. X', 0x22aaaaaa, starting.shift)
-    @detectives = @config['detectives'].collect {|d| Player.new(@window, d['name'], d['color'], starting.shift) }
+    @mr_x = Criminal.new(@window, self, 'Mr. X', 0x22aaaaaa, starting.shift)
+    @detectives = @config['detectives'].collect {|d| Detective.new(@window, self, d['name'], d['color'], starting.shift) }
 
     @current_player_id = @detectives.size
     next_player
@@ -31,20 +32,20 @@ class Board < Gosu::Image
   end
 
   def current_player_goto(x, y)
-    cell = @coords.cell_from_xy(x, y)
+    cell = Coords.instance.cell_from_xy(x, y)
     cur_player = current_player
-
-    route = @routes[cur_player.cell, cell]
-    @detectives.each {|d| route = nil if d.cell == cell}
+    route = Routes.instance.moves(cur_player.cell, cur_player.tickets, detective_cells)[cell]
 
     if cell and route
       if route.size == 1
         cur_player.move(cell, route.first)
         next_player
         return nil
-      else
+      elsif route.size > 1
         @last_move = cell
         return route
+      else
+        next_player
       end
     end
   end
@@ -66,8 +67,19 @@ class Board < Gosu::Image
   end
 
   def mrx_move
-    @current_player_id = 0
+    cell, trans, use_double = @mr_x.get_ai_move
+    @mr_x.move(cell, trans)
+    puts @mr_x.set_possible(trans).inspect
+    if use_double
+      @mr_x.take_double
+      mrx_move
+    end
+    @current_player_id = 1
     set_status
+  end
+
+  def detective_cells
+    @detectives.collect {|d| d.cell}
   end
 
   protected
@@ -83,12 +95,12 @@ class Board < Gosu::Image
   end
 
   def set_status
-    @window.status.set("#{current_player.name} move (#{current_player.cell})\n" +
-            @routes.all_from(current_player.cell, @detectives.collect{|d| d.cell}))
+    @window.status.set("#{current_player.name} move (#{current_player.cell})\n" + current_player.tickets_string + "\n" + 
+            Routes.instance.all_from(current_player.cell, current_player.tickets, detective_cells))
   end
 
   def draw_player(p)
-    c = @coords[p.cell - 1]
+    c = Coords.instance[p.cell - 1]
     p.draw(c[:x] - 12, c[:y] - 12)
   end
 end
